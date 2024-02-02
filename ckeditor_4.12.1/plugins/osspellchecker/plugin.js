@@ -1,55 +1,40 @@
+
 CKEDITOR.plugins.add('osspellchecker', {
-    icons: 'osspellchecker',
     init: function (editor) {
         var spellchecker = this;
         editor.on('contentDom', function (event) {
             if (documentElement === null) {
                 initialize(spellchecker, event);
+                //spellCheck();
             }
         });
-        editor.on('change', function (event) {
-            clearTimeout(editingTimer);
-            editingTimer = setTimeout(() => {
+        editor.on('key', function (event) {
+            if(event.data.keyCode == 190){
                 spellCheck();
-            }, waitTime);
+                console.log(event.data.keyCode);
+            }
         });
-        //CKEDITOR.dialog.add( 'osspellchecker', CKEDITOR.getUrl( this.path + 'dialogs/osspellchecker.js' ) );
-        //editor.addCommand( 'osspellchecker', new CKEDITOR.dialogCommand( 'osspellchecker' ) );    
-
-        editor.addCommand( 'osspellchecker', { modes: { wysiwyg: 1, source: 1 },
-            exec: function( editor ) {
-                console.log("show settings");//TO DO
-            },
-            async: true
-        } );
-        editor.ui.addButton && editor.ui.addButton( 'osspellchecker', {
-            label: 'osspellchecker',
-            command: 'osspellchecker',
-            toolbar: 'tools,10'
-        } );
+        editor.on('afterPaste', function (event) {
+            spellCheck();
+        });
     },
     onLoad: function () {
         CKEDITOR.document.appendStyleSheet(this.path + 'skins/default.css');
     },
 });
 var serviceURL = "https://api.languagetoolplus.com/v2/check";
-const waitTime = 5000;
-var editingTimer = null;
 var documentElement = null;
 var document$ = null;
 var editor = null;
 var documentBody = null;
 var editorOverlayDiv = null;
-var ignoredWords = [];
 var problemIdCounter = 0;
 var suggestionsIdCounter = 1;
 var osSuggestionOverlay = null;
 var osSuggestionOverlayList = null;
-var osSuggestionOverlayMessage = null;
-var osSuggestionOverlayIgnoreAll = null
 var osSpanId = null;
+const problemLines = new Map();
 var spellcheckerResponse = null;
-var documetRange = document.createRange();
 function initialize(spellchecker, event) {
     editor = event.editor;
     document$ = editor.document.$;
@@ -67,13 +52,10 @@ function setCSSLink(element, cssPath) {
     element.appendChild(cssLink);
 }
 function spellCheck() {
+    console.log("[spellCheck]>");
     while (editorOverlayDiv.firstChild) {
         editorOverlayDiv.removeChild(editorOverlayDiv.firstChild);
     }
-    getChildElements(documentBody.children);
-    editor.updateElement();
-}
-function proofReading(event) {
     getChildElements(documentBody.children);
     editor.updateElement();
 }
@@ -97,54 +79,43 @@ function createEditorSuggestionsDiv(element) {
     parentDiv.style.top = "0px";
     parentDiv.style.left = "0px";
     parentDiv.onmouseleave = (e) => hideSuggestions();
-    var childSpanMessage = document.createElement("span");
-    childSpanMessage.id = "os-contextmenu-message";
-    childSpanMessage.setAttribute("class", "os-contextmenu-message");
-    parentDiv.appendChild(childSpanMessage);
     var childUL = document.createElement("ul");
     childUL.id = "os-contextmenu";
     childUL.setAttribute("class", "os-contextmenu");
     parentDiv.appendChild(childUL);
-    var childSpanSettings = document.createElement("span");
-    childSpanSettings.id = "os-contextmenu-settings";
-    childSpanSettings.setAttribute("class", "os-contextmenu-settings");
-    var childIgnoreAll = document.createElement("p");
-    childIgnoreAll.id = "os-contextmenu-ignore-all";
-    childIgnoreAll.innerHTML = "Ignore all"
-    childIgnoreAll.setAttribute("class", "os-contextmenu-ignore-all");
-    childIgnoreAll.onclick = (e) => removeUnderline(e);
-    childIgnoreAll.appendChild(childSpanSettings);
-    parentDiv.appendChild(childIgnoreAll);
     element.appendChild(parentDiv);
     osSuggestionOverlay = parentDiv;
-    osSuggestionOverlayMessage = parentDiv.firstChild;
-    osSuggestionOverlayList = parentDiv.childNodes[1];
-    osSuggestionOverlayIgnoreAll = parentDiv.lastChild;
+    osSuggestionOverlayList = parentDiv.firstChild;
 }
 function getChildElements(elements) {
     for (var i = 0; i < elements.length; i++) {
         var elem = elements[i];
+        console.log("[getChildElements]> ", elem);
         sendData(elem);
         //getChildElements(elem);
     }
 }
 function getPosition(element) {
     var pos = element.getBoundingClientRect();
+    console.log("[getPosition]> ", pos.top, pos.left);
     return {
         top: pos.top + window.scrollY,
         left: pos.left + window.scrollX
     };
 }
 function sendData(element) {
-    var content = sanitizeContent(element.innerHTML);
+    var content = element.innerHTML;
+    console.log("[sendData]> ", content);
     if(content !== "<br>"){
         problemIdCounter++;
+        problemLines.set(problemIdCounter, content);
         sendRequest(content, "en-US", element, problemIdCounter);//API Call 
     }
 }
 function underlineWords(element, response, id) {
     var pos = element.getBoundingClientRect();
     var w = pos.width;
+    console.log("[underlineWords]> width: ", w);
     var suggestions = response.matches;
     for (var i = 0; i < suggestions.length; i++) {
         var word = suggestions[i];
@@ -154,10 +125,9 @@ function underlineWords(element, response, id) {
             suggestionArray.push(replacements[j].value)
         }
         var childSpan = document.createElement("span");
-        childSpan.id = "os-span-" + id + "-" + suggestionsIdCounter;
+        childSpan.id = "os-span-" + response.id + "-" + suggestionsIdCounter;
         childSpan.style.position = "absolute";
         var wordPosition = getWordPosition(element, word.offset, word.length);
-        var currentWord = getWord(element, word.offset, word.length);
         childSpan.style.top = wordPosition.top + 13 + "px";
         childSpan.style.left = wordPosition.left + 3 + "px"; //position of the word
         childSpan.style.width = wordPosition.width + 2 + "px";//width of the word
@@ -167,7 +137,6 @@ function underlineWords(element, response, id) {
         childSpan.setAttribute("os-message", word.message);
         childSpan.setAttribute("os-sugestions", suggestionArray);
         childSpan.setAttribute("os-id", id);
-        childSpan.setAttribute("os-word", currentWord);
         childSpan.setAttribute("os-sugestion-id", suggestionsIdCounter);
         childSpan.setAttribute("os-start", word.offset);
         childSpan.setAttribute("os-length", word.length);
@@ -176,24 +145,18 @@ function underlineWords(element, response, id) {
         editorOverlayDiv.appendChild(childSpan);
         suggestionsIdCounter++;
     }
+    console.log("[underlineWords]> ", response);
 }
 function getWordPosition(element, startOffset, wordLength) {
-    var node = element.firstChild;
-    if(startOffset != 0){
-        startOffset = startOffset - 1;
-    }
-    documetRange.setStart(node, startOffset);
-    documetRange.setEnd(node, startOffset + wordLength);
-    return documetRange.getBoundingClientRect();
-}
-function getWord(element, startOffset, wordLength) {
-    var node = element.firstChild;
-    var text = node.data;
-    return text.substring(startOffset, startOffset + wordLength);
+    var range = document.createRange();
+    range.setStart(element.firstChild, startOffset - 1);
+    range.setEnd(element.firstChild, startOffset + wordLength - 1);
+    return range.getBoundingClientRect();
 }
 function showSuggestions(e) {
     var elem = e.currentTarget;
     osSpanId = elem.id;
+    console.log("[showSuggestions]> osSpanId: ", osSpanId);
     var message = elem.getAttribute("os-message");
     var actualWordId = elem.getAttribute("os-sugestion-id");
     var suggestions = elem.getAttribute("os-sugestions");
@@ -202,10 +165,11 @@ function showSuggestions(e) {
     var wordLength = elem.getAttribute("os-length");
     var coordinateX = elem.getAttribute("os-x");
     var coordinateY = elem.getAttribute("os-y");
+    console.log("[showSuggestions]> os-message: ", message);
+    console.log("[showSuggestions]> os-sugestions: ", suggestions);
     var arr = suggestions.split(",");
-    //osSuggestionOverlayMessage.innerHTML = message;
+    var newWord = "";
     osSuggestionOverlayList.innerHTML = "";
-    osSuggestionOverlayIgnoreAll.setAttribute("os-word", elem.getAttribute("os-word"));
     for (var i = 0; i < arr.length; i++) {
         var childLI = document.createElement("li");
         childLI.onclick = (e) => updateWord(e, Number(actualWordId), Number(lineId), Number(startOffset), Number(wordLength), Number(coordinateX), Number(coordinateY));
@@ -218,30 +182,21 @@ function showSuggestions(e) {
     osSuggestionOverlay.style.left = position.left + 'px';
     osSuggestionOverlay.style.display = 'block';
 }
-function removeUnderline(e){
-    var elem = e.currentTarget;
-    var wd = elem.getAttribute("os-word");
-    ignoredWords.push(elem.getAttribute(wd));
-    var underLines = editorOverlayDiv.childNodes;
-    for(var i = 0; i < underLines.length; i++){
-        var child = underLines[i];
-        var word = child.getAttribute("os-word");
-        if(word == wd){
-            editorOverlayDiv.removeChild(child);
-        }
-    }
-    hideSuggestions();
-}
 function updateWord(event, actualWordId, lineId, startOffset, wordLength, x, y) {
     var newWord = event.currentTarget.innerText;
+    console.log("[updateWord]> word: ", newWord);
+    console.log("[updateWord]> lineId: ", lineId);
     var elem = getElementToUpdateContent(x, y);
-    var target = sanitizeContent(elem.innerHTML);
+    var content = problemLines.get(lineId);
+    var target = sanitizeLines(content);
     target = target.replace(target.substring(startOffset, startOffset + wordLength), newWord);
     elem.innerHTML = target;
+    problemLines.set(lineId, target);
+    console.log(problemLines);
     hideSuggestions();
-    spellCheck();
-    //deleteWordUnderline();
+    deleteWordUnderline();
     //updateResponse(actualWordId, wordLength, newWord.length);
+    //spellCheck();
 }
 function deleteWordUnderline(){
     var child = document$.getElementById(osSpanId);
@@ -254,8 +209,8 @@ function getElementToUpdateContent(x, y){
 function hideSuggestions() {
     osSuggestionOverlay.style.display = 'none';
 }
-function sanitizeContent(content) {
-    return content.replace(/&nbsp;/g, ' ');
+function sanitizeLines(line) {
+    return line.replace(/&nbsp;/g, ' ');
 }
 function updateResponse(sid, wordLength, newWordLength) {
     var data = spellcheckerResponse.data;
@@ -278,6 +233,7 @@ function sendRequest(data, language, element, id) {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             underlineWords(element, JSON.parse(this.responseText), problemIdCounter);
+            console.log(this.responseText);
         }
     };
     xhttp.open("POST", serviceURL, true);
@@ -293,6 +249,137 @@ function sendRequest(data, language, element, id) {
 window.addEventListener('resize', function (event) {
     spellCheck();
 });
+console.log("[OS SpellChecker]> Version 1.0.0");
+//paste this text in editor 
+//yuu te werewewer
+//Her ar the new verion updates of OS-Spellchecker.
+//Enter you text here. Hover on the marked words for intant correction suggestions. To got the whole text checked at once, switch to the Proofread in dialog mode in the editr settings.
+var resp = {
+    "id": 1,
+    "data": [
+        {
+            "sid": 1,
+            "type": "spelling",
+            "word": "yuu",
+            "pos": 0,
+            "len": 3,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "you", "yours"
+            ]
+        },
+        {
+            "sid": 2,
+            "type": "spelling",
+            "word": "te",
+            "pos": 4,
+            "len": 2,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "to", "too"
+            ]
+        },
+        {
+            "sid": 3,
+            "type": "spelling",
+            "word": "werewewer",
+            "pos": 7,
+            "len": 8,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "where", "were"
+            ]
+        }
+    ]
+};
+var resp2 = {
+    "id": 1,
+    "data": [
+        {
+            "sid": 1,
+            "type": "grammer",
+            "word": "Her",
+            "pos": 0,
+            "len": 3,
+            "message": "Grammer mistake",
+            "suggestion": [
+                "Here", "here"
+            ]
+        },
+        {
+            "sid": 2,
+            "type": "spelling",
+            "word": "ar",
+            "pos": 4,
+            "len": 2,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "are"
+            ]
+        },
+        {
+            "sid": 3,
+            "type": "spelling",
+            "word": "verion",
+            "pos": 15,
+            "len": 6,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "version", "versions"
+            ]
+        }
+    ]
+};
+var resp3 = {
+    "id": 1,
+    "data": [
+        {
+            "sid": 1,
+            "type": "grammer",
+            "word": "you",
+            "pos": 6,
+            "len": 3,
+            "message": "Grammer mistake",
+            "suggestion": [
+                "your"
+            ]
+        },
+        {
+            "sid": 2,
+            "type": "spelling",
+            "word": "intant",
+            "pos": 51,
+            "len": 6,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "instant"
+            ]
+        },
+        {
+            "sid": 3,
+            "type": "grammer",
+            "word": "got",
+            "pos": 85,
+            "len": 3,
+            "message": "Grammer mistake",
+            "suggestion": [
+                "get", "go to"
+            ]
+        },
+        {
+            "sid": 4,
+            "type": "spelling",
+            "word": "editr",
+            "pos": 167,
+            "len": 5,
+            "message": "Spelling mistake",
+            "suggestion": [
+                "editor", "edit"
+            ]
+        }
+    ]
+};
+var wsbundleResponce = { "r": [{ "m": [{ "t": "grammar", "o": 6, "l": 3, "m": "", "r": "4557035884548616689", "d": "", "c": "", "s": ["your"] }], "l": "en_US" }, { "m": [{ "t": "spelling", "o": 30, "l": 6, "m": "Spelling mistake", "s": ["instant"] }], "l": "en_US" }, { "m": [{ "t": "grammar", "o": 3, "l": 3, "m": "", "r": "1793119878962162431", "d": "", "c": "", "s": ["get"] }], "l": "en_US" }] };
 var languagetoolplusResponse = {
     "software": {
         "name": "LanguageTool",
