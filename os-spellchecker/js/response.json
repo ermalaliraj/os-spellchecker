@@ -1,0 +1,189 @@
+curl -X POST 
+--header 'Content-Type: application/x-www-form-urlencoded' 
+--header 'Accept: application/json' 
+-d 'text=Enter%20you%20text%20here.%20Hover%20on%20the%20marked%20words%20for%20intant%20correction%20suggestions.%20To%20got%20the%20whole%20text%20checked%20at%20once%2C%20switch%20to%20the%20Proofread%20in%20dialog%20mode%20in%20the%20editor%20settings.&language=en-US&enabledOnly=false&level=default' 
+'https://api.languagetoolplus.com/v2/check'
+
+{
+    "software": {
+      "name": "LanguageTool",
+      "version": "6.4.12",
+      "buildDate": "2024-01-17 11:55:05 +0100",
+      "apiVersion": 1,
+      "premium": true,
+      "premiumHint": "You might be missing errors only the Premium version can find. Contact us at support<at>languagetoolplus.com.",
+      "status": ""
+    },
+    "warnings": {
+      "incompleteResults": false
+    },
+    "language": {
+      "name": "English (US)",
+      "code": "en-US",
+      "detectedLanguage": {
+        "name": "English (US)",
+        "code": "en-US",
+        "confidence": 0.99,
+        "source": "fasttext"
+      }
+    },
+    "matches": [
+      {
+        "message": "“you” seems less likely than “your” (belonging to you).",
+        "shortMessage": "“you” not likely",
+        "replacements": [
+          {
+            "value": "your",
+            "shortDescription": "belonging to you"
+          }
+        ],
+        "offset": 6,
+        "length": 3,
+        "context": {
+          "text": "Enter you text here. Hover on the marked words fo...",
+          "offset": 6,
+          "length": 3
+        },
+        "sentence": "Enter you text here.",
+        "type": {
+          "typeName": "Other"
+        },
+        "rule": {
+          "id": "AI_HYDRA_LEO_CP_YOU_YOUR",
+          "description": "Detects potentially wrong usage of \"you\"",
+          "issueType": "uncategorized",
+          "category": {
+            "id": "MISC",
+            "name": "Miscellaneous"
+          },
+          "isPremium": false
+        },
+        "ignoreForIncompleteSentence": false,
+        "contextForSureMatch": 0
+      },
+      {
+        "message": "Possible spelling mistake found.",
+        "shortMessage": "Spelling mistake",
+        "replacements": [
+          {
+            "value": "intent"
+          },
+          {
+            "value": "infant"
+          },
+          {
+            "value": "instant"
+          },
+          {
+            "value": "intact"
+          },
+          {
+            "value": "int ant"
+          }
+        ],
+        "offset": 51,
+        "length": 6,
+        "context": {
+          "text": "...ext here. Hover on the marked words for intant correction suggestions. To got the whol...",
+          "offset": 43,
+          "length": 6
+        },
+        "sentence": "Hover on the marked words for intant correction suggestions.",
+        "type": {
+          "typeName": "UnknownWord"
+        },
+        "rule": {
+          "id": "MORFOLOGIK_RULE_EN_US",
+          "description": "Possible spelling mistake",
+          "issueType": "misspelling",
+          "category": {
+            "id": "TYPOS",
+            "name": "Possible Typo"
+          },
+          "isPremium": false
+        },
+        "ignoreForIncompleteSentence": false,
+        "contextForSureMatch": 0
+      },
+      {
+        "message": "The verb after “to” should be in the base form as part of the to-infinitive. A verb can take many forms, but the base form is always used in the to-infinitive.",
+        "shortMessage": "",
+        "replacements": [
+          {
+            "value": "get"
+          }
+        ],
+        "offset": 85,
+        "length": 3,
+        "context": {
+          "text": "...s for intant correction suggestions. To got the whole text checked at once, switch ...",
+          "offset": 43,
+          "length": 3
+        },
+        "sentence": "To got the whole text checked at once, switch to the Proofread in dialog mode in the editor settings.",
+        "type": {
+          "typeName": "Other"
+        },
+        "rule": {
+          "id": "TO_NON_BASE",
+          "subId": "5",
+          "sourceFile": "grammar.xml",
+          "description": "'to' + non-base form",
+          "issueType": "grammar",
+          "category": {
+            "id": "GRAMMAR",
+            "name": "Grammar"
+          },
+          "isPremium": false
+        },
+        "ignoreForIncompleteSentence": true,
+        "contextForSureMatch": -1
+      }
+    ],
+    "sentenceRanges": [
+      [
+        0,
+        20
+      ],
+      [
+        21,
+        81
+      ],
+      [
+        82,
+        183
+      ]
+    ],
+    "extendedSentenceRanges": [
+      {
+        "from": 0,
+        "to": 20,
+        "detectedLanguages": [
+          {
+            "language": "en",
+            "rate": 1
+          }
+        ]
+      },
+      {
+        "from": 21,
+        "to": 81,
+        "detectedLanguages": [
+          {
+            "language": "en",
+            "rate": 1
+          }
+        ]
+      },
+      {
+        "from": 82,
+        "to": 183,
+        "detectedLanguages": [
+          {
+            "language": "en",
+            "rate": 1
+          }
+        ]
+      }
+    ]
+  }

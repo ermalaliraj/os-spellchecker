@@ -1,0 +1,26 @@
+WProofreader SDK
+=====================
+
+
+## Calls
+
+POST https://svc.webspellchecker.net/api
+
+7NYwnrCWldqOGgY&
+format=json&
+app_type=proofreader_editable_controls&
+cmd=check&
+lang=auto&
+enforce_ai=true&
+short_answer=true&
+min_word_length=3&
+tokens=%5B%22Enter%20you%20text%20here.%22%2C%22Hover%20on%20the%20marked%20words%20for%20intant%20correction%20suggestions.%22%2C%22To%20got%20the%20whole%20text%20checked%20at%20once%2C%20switch%20to%20the%20Proofread%20in%20dialog%20mode%20in%20the%20editor%20settings.%22%5D
+
+token=encoded phrase to check
+https://meyerweb.com/eric/tools/dencoder/
+
+["Enter you text here.","Hover on the marked words for intant correction suggestions.","To got the whole text checked at once, switch to the Proofread in dialog mode in the editor settings."]
+
+### Different methods
+cmd=get_info
+cmd=check

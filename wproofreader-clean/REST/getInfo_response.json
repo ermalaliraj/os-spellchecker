@@ -1,0 +1,13 @@
+{
+  "langList": {
+    "ltr": {
+      "auto": "Auto Detect",
+      "en_US": "American English"
+    },
+    "rtl": {}
+  },
+  "banner": false,
+  "session": "fea66932-b578-11ee-bc0e-0ebabc25438d",
+  "canRemoveBranding": false,
+  "sendStatistics": true
+}

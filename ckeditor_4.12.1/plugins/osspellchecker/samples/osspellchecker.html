@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>osspellchecker</title>
+    <script src="../../../ckeditor.js"></script>
+</head>
+<body>
+    <form>       
+        <textarea name="editorEA" id="editorEA" rows="10" cols="80">                
+            Enter you text here. Hover on the marked words for intant correction suggestions. To got the whole text checked at once, switch to the Proofread in dialog mode in the editr settings
+        </textarea>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                CKEDITOR.replace('editorEA');                
+            });
+        </script>
+    </form>
+</body>
+</html>

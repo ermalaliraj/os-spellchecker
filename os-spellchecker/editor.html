@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>osspellchecker</title>
+    <link rel="stylesheet" href="css/editor.css">
+    <script src="../ckeditor/ckeditor.js"></script>
+    <script src="js/editor.js" defer></script>
+</head>
+<body>
+    <form>
+        <div id="os-suggestion-overlay" class="os-suggestion-overlay" onmouseleave="hideSuggestions();">
+            <ul id="os-contextmenu" class="os-contextmenu"></ul>
+        </div>
+        <textarea name="editorEA" id="editorEA" rows="10" cols="80">                
+            Enter you text here. Hover on the marked words for intant correction suggestions. To got the whole text checked at once, switch to the Proofread in dialog mode in the editr settings.
+        </textarea>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                CKEDITOR.replace('editorEA');
+                CKEDITOR.instances.editorEA.on('contentDom', function () {
+                    var editorInstance = this;
+                    initialize();
+                    editorInstance.document.on('keyup', function (event) {
+                        spellCheck();
+                    });                                        
+                });                
+            });
+        </script>
+    </form>
+</body>
+</html>

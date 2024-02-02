@@ -1,0 +1,55 @@
+.spellcheck-highlight {
+    float: none!important;
+    margin: 0!important;
+    padding: 0!important;
+    display: inline;
+    color: inherit!important;
+    font-size: inherit!important;
+    line-height: inherit!important;
+    border-bottom: 2px solid rgba(0,98,231,.65)!important;
+    box-sizing: border-box!important;
+}
+.spellcheck-highlight.os-span-spelling {    
+    border-bottom: 2px solid rgba(255,98,100,.65)!important;
+}
+.editor-overlay{
+    margin: 0px;
+    padding: 0px;
+    min-width: 100%;
+    min-height: 100%;
+    border: 0px;    
+    position: relative;
+    overflow: hidden;
+    border-color: transparent;
+    border-width: 0px;
+    border-style: none;
+    padding: 0px;    
+    pointer-events: none;
+    box-sizing: content-box;
+    width: 912px;
+    z-index: 1;   
+}
+div.os-suggestion-overlay{
+    width: 100px;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px #d1d7dc, 0 2px 4px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.08);
+    color: #2d2f31;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+}
+ul.os-contextmenu{
+    padding: 0px;
+    margin: 0;
+}
+li.os-contextmenu-list{
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+    border-bottom:2px solid transparent;
+    cursor: pointer;
+}
+li.os-contextmenu-list:hover {
+    box-shadow: 0 0 0 1px #d1d7dc, 0 2px 4px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.08);
+} 

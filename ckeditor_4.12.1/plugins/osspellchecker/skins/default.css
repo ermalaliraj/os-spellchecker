@@ -1,0 +1,78 @@
+.spellcheck-highlight {
+    float: none!important;
+    margin: 0!important;
+    padding: 0!important;
+    display: inline;
+    color: inherit!important;
+    font-size: inherit!important;
+    line-height: inherit!important;
+    border-bottom: 2px solid rgba(0,98,231,.65)!important;
+    box-sizing: border-box!important;
+}
+.spellcheck-highlight.os-span-spelling {    
+    border-bottom: 2px solid rgba(255,98,100,.65)!important;
+}
+.spellcheck-highlight.os-span-TYPOS {    
+    border-bottom: 2px solid rgba(255,98,100,.65)!important;
+}
+.editor-overlay{
+    margin: 0px;
+    padding: 0px;
+    min-width: 100%;
+    min-height: 100%;
+    border: 0px;    
+    position: relative;
+    overflow: hidden;
+    border-color: transparent;
+    border-width: 0px;
+    border-style: none;
+    padding: 0px;    
+    pointer-events: none;
+    box-sizing: content-box;
+    width: 912px;
+    z-index: 1;   
+}
+div.os-suggestion-overlay{
+    width: 120px;    
+    background-color: #F8F9F9;
+    box-shadow: 0 0 0 1px #d1d7dc, 0 2px 4px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.08);
+    color: #2d2f31;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+    font-family: sans-serif, Arial, Verdana, "Trebuchet MS", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+ul.os-contextmenu{
+    padding: 0px;
+    margin: 0;
+    max-height: 100px;
+    overflow: auto;
+}
+p.os-contextmenu-ignore-all{
+    cursor: pointer;
+    padding: 0px 0px 5px 5px;
+    margin: 0px;
+    font-size: 16px;
+}
+span.os-contextmenu-settings:after {
+    content: '\2807';
+    font-size: 16px;
+    padding: 8px;
+}
+span.os-contextmenu-settings {
+    float: right;
+}
+li.os-contextmenu-list{
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+    border-bottom:2px solid transparent;
+    cursor: pointer;
+}
+li.os-contextmenu-list:hover {
+    box-shadow: 0 0 0 1px #d1d7dc, 0 2px 4px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.08);
+} 
+p.os-contextmenu-ignore-all:hover, li.span.os-contextmenu-settings:hover {
+    background-color: #D6DBDF
+} 

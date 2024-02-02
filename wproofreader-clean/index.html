@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>CKEditor</title>
+    <script src="wscbundle/wscbundle.js"></script>
+    <script src="../ckeditor/ckeditor.js"></script>
+</head>
+
+<body>
+
+<div class="ckeditor4-editor">
+    <p>Enter you text here. Hover on the marked words for intant correction suggestions. To got the whole
+        text checked at once, switch to the Proofread in dialog mode in the editor settings.</p>
+</div>
+
+<script>
+  window.WEBSPELLCHECKER_CONFIG = {
+    "autoSearch": true,
+    "autoDestroy": true,
+    "autocorrect": true,
+    "autocomplete": true,
+    "enforceAI": true,
+    "serviceId": "7NYwnrCWldqOGgY",
+    "serviceProtocol": "https",
+    "servicePort": "443",
+    "serviceHost": "svc.webspellchecker.net",
+    "servicePath": "api",
+    "theme": "gray"
+  }
+</script>
+
+<script>
+  CKEDITOR.disableAutoInline = true;
+  CKEDITOR.config.removePlugins = 'scayt,wsc';
+  CKEDITOR.on('instanceReady', function (event) {
+    var editor = event.editor;
+    WEBSPELLCHECKER.init({
+      container: editor.window.getFrame() ? editor.window.getFrame().$ : editor.element.$
+    });
+  });
+
+  CKEDITOR.replace(document.querySelector('.ckeditor4-editor'), {});
+</script>
+
+</body>
+
+</html>
